@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欧洲三国旅行行程 - 德国·挪威·冰岛</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .header p {
+            color: #64748b;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-card .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #475569;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .filter-btn:hover {
+            background: #f1f5f9;
+        }
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        .day-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            position: relative;
+            transition: all 0.3s;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .day-card.hidden {
+            display: none;
+        }
+        .day-card .dot {
+            position: absolute;
+            left: -24px;
+            top: 24px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid #f8fafc;
+            z-index: 1;
+        }
+        .day-card.last .dot {
+            background: #ef4444;
+        }
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .day-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .day-badge.last {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .day-title {
+            margin: 0;
+            font-size: 18px;
+            color: #1e293b;
+        }
+        .day-date {
+            margin: 4px 0 0 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .day-icon {
+            font-size: 20px;
+        }
+        .flight-box {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .flight-box.last {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .tag {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .tag-norway {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .tag-iceland {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .hotel-info {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .cost-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .cost-section h3 {
+            margin: 0 0 16px 0;
+            font-size: 16px;
+            color: #1e293b;
+        }
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        .cost-row .label {
+            color: #475569;
+        }
+        .cost-row .value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .cost-total {
+            border-top: 2px solid #e2e8f0;
+            margin-top: 4px;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .tips {
+            background: #eff6ff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        .tips h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #1e40af;
+        }
+        .tips ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.8;
+        }
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .day-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇪🇺 欧洲三国旅行行程</h1>
+            <p>2026年9月23日 — 10月5日 · 德国 · 挪威 · 冰岛</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="icon">✈️</div>
+                <div class="label">总天数</div>
+                <div class="value">13 天</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🏨</div>
+                <div class="label">住宿城市</div>
+                <div class="value">8 个</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">💰</div>
+                <div class="label">总花销</div>
+                <div class="value">¥46,858</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterCountry('all', this)">全部</button>
+            <button class="filter-btn" onclick="filterCountry('germany', this)">🇩🇪 德国</button>
+            <button class="filter-btn" onclick="filterCountry('norway', this)">🇳🇴 挪威</button>
+            <button class="filter-btn" onclick="filterCountry('iceland', this)">🇮🇸 冰岛</button>
+        </div>
+
+        <div class="timeline" id="timeline">
+            <!-- Day 1 -->
+            <div class="day-card" data-country="germany">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 1 · 周三</span>
+                        <h3 class="day-title">🇩🇪 慕尼黑 Munich</h3>
+                        <p class="day-date">9月23日 · 抵达日</p>
+                    </div>
+                    <span class="day-icon">✈️</span>
+                </div>
+                <div class="flight-box">
+                    <strong>航班 LH0723</strong> · 抵达慕尼黑机场 (MUC) 19:15
+                </div>
+                <p style="font-size: 14px; color: #475569;">机场附近酒店过夜，休整准备次日行程</p>
+                <div class="hotel-info">🏨 Premier Inn München Airport Ost · Freisinger Str. 94, Oberding</div>
+            </div>
+
+            <!-- Day 2 -->
+            <div class="day-card" data-country="norway">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 2 · 周四</span>
+                        <h3 class="day-title">🇳🇴 奥斯陆 Oslo</h3>
+                        <p class="day-date">9月24日</p>
+                    </div>
+                    <span class="day-icon">🏛️</span>
+                </div>
+                <div class="flight-box">
+                    <strong>航班 LH2452</strong> · MUC 08:40 → OSL 10:55
+                </div>
+                <div class="tags">
+                    <span class="tag tag-norway">蒙克美术馆</span>
+                    <span class="tag tag-norway">奥斯陆歌剧院</span>
+                    <span class="tag tag-norway">阿克斯胡斯城堡</span>
+                    <span class="tag tag-norway">Aker Brygge</span>
+                    <span class="tag tag-norway">Fuglen Cafe</span>
+                    <span class="tag tag-norway">购物</span>
+                </div>
+                <div class="hotel-info">🏨 Radisson Red Hotel, Oslo Airport · Gardermoen</div>
+            </div>
+
+            <!-- Day 3 -->
+            <div class="day-card" data-country="iceland">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 3 · 周五</span>
+                        <h3 class="day-title">🇮🇸 雷克雅未克 Reykjavik</h3>
+                        <p class="day-date">9月25日 · 冰岛自驾开始 🚗</p>
+                    </div>
+                    <span class="day-icon">🚗</span>
+                </div>
+                <div class="flight-box">
+                    <strong>航班 SK4787</strong> · OSL 06:15 → KEF 07:05 · <strong>机场取车</strong>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-iceland">哈尔格林姆教堂</span>
+                    <span class="tag tag-iceland">彩虹街</span>
+                    <span class="tag tag-iceland">托宁湖</span>
+                    <span class="tag tag-iceland">Harpa音乐厅</span>
+                    <span class="tag tag-iceland">太阳航海者雕塑</span>
+                    <span class="tag tag-iceland">老港口</span>
+                </div>
+                <div class="hotel-info">🏨 Mjolk Hotel · Snorrabraut 54, Reykjavik</div>
+            </div>
+
+            <!-- Day 4 -->
+            <div class="day-card" data-country="iceland">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 4 · 周六</span>
+                        <h3 class="day-title">🇮🇸 斯奈山半岛 Snaefellsnes</h3>
+                        <p class="day-date">9月26日 · 自驾 🚗</p>
+                    </div>
+                    <span class="day-icon">🏔️</span>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-iceland">教会山 & 瀑布</span>
+                    <span class="tag tag-iceland">黑教堂 Búðakirkja</span>
+                    <span class="tag tag-iceland">Arnarstapi渔村</span>
+                    <span class="tag tag-iceland">Lóndrangar海崖</span>
+                    <span class="tag tag-iceland">Djúpalónssandur黑沙滩</span>
+                    <span class="tag tag-iceland">Stykkishólmur小镇</span>
+                </div>
+                <div class="hotel-info">🏨 Lysuholl · Snaefellsbaer</div>
+            </div>
+
+            <!-- Day 5 -->
+            <div class="day-card" data-country="iceland">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 5 · 周日</span>
+                        <h3 class="day-title">🇮🇸 黄金圈 → 塞尔福斯 Selfoss</h3>
+                        <p class="day-date">9月27日 · 自驾 🚗</p>
+                    </div>
+                    <span class="day-icon">🌋</span>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-iceland">辛格维利尔国家公园</span>
+                    <span class="tag tag-iceland">Brúarfoss蓝瀑布</span>
+                    <span class="tag tag-iceland">间歇泉 Geysir</span>
+                    <span class="tag tag-iceland">黄金瀑布 Gullfoss</span>
+                    <span class="tag tag-iceland">Hvolsvöllur</span>
+                </div>
+                <div class="hotel-info">🏨 Fífa · Blesastaðir 1, Selfoss</div>
+            </div>
+
+            <!-- Day 6 -->
+            <div class="day-card" data-country="iceland">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 6 · 周一</span>
+                        <h3 class="day-title">🇮🇸 维克 Vik</h3>
+                        <p class="day-date">9月28日 · 南海岸自驾 🚗</p>
+                    </div>
+                    <span class="day-icon">✈️</span>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-iceland">Gljúfrabúi秘瀑</span>
+                    <span class="tag tag-iceland">塞里雅兰瀑布</span>
+                    <span class="tag tag-iceland">飞机残骸</span>
+                    <span class="tag tag-iceland">Loftsalahellir洞穴</span>
+                    <span class="tag tag-iceland">Reynisfjara黑沙滩</span>
+                    <span class="tag tag-iceland">Vik购物</span>
+                </div>
+                <div class="hotel-info">🏨 Önundarhorn · Leirnavegur, Hvolsvöllur</div>
+            </div>
+
+            <!-- Day 7 -->
+            <div class="day-card" data-country="iceland">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 7 · 周二</span>
+                        <h3 class="day-title">🇮🇸 冰河湖区域 Hali</h3>
+                        <p class="day-date">9月29日 · 东南海岸自驾 🚗</p>
+                    </div>
+                    <span class="day-icon">🧊</span>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-iceland">羽毛峡谷</span>
+                    <span class="tag tag-iceland">Svínafellsjökull冰川</span>
+                    <span class="tag tag-iceland">Fjallsárlón冰河湖</span>
+                    <span class="tag tag-iceland">杰古沙龙冰河湖</span>
+                    <span class="tag tag-iceland">钻石沙滩</span>
+                </div>
+                <div class="hotel-info">🏨 Fosshotel Nupar · Núpar, Skaftárhreppur</div>
+            </div>
+
+            <!-- Day 8 -->
+            <div class="day-card" data-country="iceland">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 8 · 周三</span>
+                        <h3 class="day-title">🇮🇸 雷克雅未克 Reykjavik</h3>
+                        <p class="day-date">9月30日 · 返回首都 / 还车 🚗</p>
+                    </div>
+                    <span class="day-icon">🛍️</span>
+                </div>
+                <div class="flight-box">
+                    自驾返回雷克雅未克 · <strong>机场还车</strong> · Laugavegur购物街 · 纪念品采购 · 市区休闲
+                </div>
+                <div class="hotel-info">🏨 Snorri's Guesthouse · Snorrabraut 61, Reykjavik</div>
+            </div>
+
+            <!-- Day 9 -->
+            <div class="day-card" data-country="norway">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 9 · 周四</span>
+                        <h3 class="day-title">🇳🇴 奥斯陆 Oslo</h3>
+                        <p class="day-date">10月1日</p>
+                    </div>
+                    <span class="day-icon">👑</span>
+                </div>
+                <div class="flight-box">
+                    <strong>航班 SK4788</strong> · KEF 11:15 → OSL 15:55
+                </div>
+                <div class="tags">
+                    <span class="tag tag-norway">卡尔·约翰斯大道</span>
+                    <span class="tag tag-norway">王宫</span>
+                    <span class="tag tag-norway">市区休闲</span>
+                </div>
+                <div class="hotel-info">🏨 Radisson Blu Plaza Hotel · Sonja Henies plass 3, Oslo</div>
+            </div>
+
+            <!-- Day 10 -->
+            <div class="day-card" data-country="norway">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 10 · 周五</span>
+                        <h3 class="day-title">🇳🇴 卑尔根 Bergen</h3>
+                        <p class="day-date">10月2日</p>
+                    </div>
+                    <span class="day-icon">🏘️</span>
+                </div>
+                <div class="flight-box">
+                    <strong>航班 SK0267</strong> · OSL 13:25 → BGO 14:20
+                </div>
+                <div class="tags">
+                    <span class="tag tag-norway">布吕根码头</span>
+                    <span class="tag tag-norway">鱼市场</span>
+                    <span class="tag tag-norway">弗洛伊恩山</span>
+                </div>
+                <div class="hotel-info">🏨 Grand Hotel Terminus · Zander Kaaes gate 6, Bergen</div>
+            </div>
+
+            <!-- Day 11 -->
+            <div class="day-card" data-country="norway">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 11 · 周六</span>
+                        <h3 class="day-title">🇳🇴 卑尔根 Bergen</h3>
+                        <p class="day-date">10月3日 · 徒步日</p>
+                    </div>
+                    <span class="day-icon">🥾</span>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-norway">Fløyvarden 步道</span>
+                    <span class="tag tag-norway">Brushytten 小屋</span>
+                </div>
+                <div class="hotel-info">🏨 Kong Oscars gate 28 · Bergen</div>
+            </div>
+
+            <!-- Day 12 -->
+            <div class="day-card" data-country="norway">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge">Day 12 · 周日</span>
+                        <h3 class="day-title">🇳🇴 卑尔根 → 奥斯陆</h3>
+                        <p class="day-date">10月4日</p>
+                    </div>
+                    <span class="day-icon">🎨</span>
+                </div>
+                <div class="tags">
+                    <span class="tag tag-norway">KODE 艺术博物馆</span>
+                    <span class="tag tag-norway">Troldhaugen 故居</span>
+                    <span class="tag tag-norway">纪念品购物</span>
+                </div>
+                <div class="flight-box">
+                    <strong>航班 SK0278</strong> · BGO 17:15 → OSL 18:05
+                </div>
+                <div class="hotel-info">🏨 Radisson Red Hotel, Oslo Airport · Gardermoen</div>
+            </div>
+
+            <!-- Day 13 -->
+            <div class="day-card last" data-country="germany">
+                <div class="dot"></div>
+                <div class="day-header">
+                    <div>
+                        <span class="day-badge last">Day 13 · 周一</span>
+                        <h3 class="day-title">🇩🇪 奥斯陆 → 慕尼黑 → 北京</h3>
+                        <p class="day-date">10月5日 · 返程日</p>
+                    </div>
+                    <span class="day-icon">🏠</span>
+                </div>
+                <div class="flight-box last">
+                    <div><strong>LH2457</strong> OSL 07:10 → MUC 09:25</div>
+                    <div style="margin-top: 6px;"><strong>LH7318</strong> MUC 13:00 → PEK 04:35 (+1)</div>
+                </div>
+                <p style="font-size: 14px; color: #475569;">结束旅程，返回北京</p>
+            </div>
+        </div>
+
+        <div class="cost-section">
+            <h3>💰 费用明细</h3>
+            <div class="cost-row">
+                <span class="label">机票</span>
+                <span class="value">¥24,800</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">高铁 (南京-北京)</span>
+                <span class="value">¥1,300</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">酒店</span>
+                <span class="value">¥14,000</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">保险</span>
+                <span class="value">¥278</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">签证</span>
+                <span class="value">¥480</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">租车（冰岛6天）</span>
+                <span class="value">¥6,000</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">其他杂费（油费/停车/餐饮等）</span>
+                <span class="value">？？？</span>
+            </div>
+            <div class="cost-row">
+                <span class="label">游玩项目</span>
+                <span class="value">？？？</span>
+            </div>
+            <div class="cost-total">
+                <span>总计</span>
+                <span style="font-size: 18px;">¥46,858</span>
+            </div>
+        </div>
+
+        <div class="tips">
+            <h4>📋 行程要点</h4>
+            <ul>
+                <li>🇮🇸 冰岛段 (Day 3-8) 为自驾环岛，约6天，租车费用约 ¥6,000</li>
+                <li>🇳🇴 挪威段涵盖奥斯陆市区、卑尔根峡湾城市</li>
+                <li>共涉及 6 段航班，建议提前确认行李直挂</li>
+                <li>10月初北欧已进入秋季，注意保暖防雨</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function filterCountry(country, btn) {
+            const cards = document.querySelectorAll('.day-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            cards.forEach(card => {
+                if (country === 'all' || card.dataset.country === country) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
